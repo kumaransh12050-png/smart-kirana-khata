@@ -1,0 +1,2505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Kirana Khata — Professional Digital Ledger & Loyalty System</title>
+<!-- Supabase JS Client v2 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --green: #15803d;
+  --green-dark: #0f5132;
+  --green-deep: #052e16;
+  --green2: #ecfdf5;
+  --green3: #d1fae5;
+  --gold: #b45309;
+  --gold-bg: #fef3c7;
+  --ink: #0f172a;
+  --ink-light: #334155;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --bg: #f8fafc;
+  --card-bg: #ffffff;
+  --red: #b91c1c;
+  --red-bg: #fee2e2;
+  --blue: #1d4ed8;
+  --blue-bg: #eff6ff;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --radius: 12px;
+  --transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Animations */
+@keyframes slideDownFade {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulseGlow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.02); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+/* Top App Header */
+header {
+  background: linear-gradient(135deg, var(--green-dark) 0%, var(--green) 100%);
+  color: white;
+  padding: 16px 20px;
+  box-shadow: 0 4px 12px rgba(5, 46, 22, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+header .wrap {
+  max-width: 1240px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.brand-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.brand-icon {
+  font-size: 28px;
+  background: rgba(255, 255, 255, 0.16);
+  padding: 6px 10px;
+  border-radius: 12px;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+h1 {
+  font-size: clamp(20px, 3.5vw, 26px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+header p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  opacity: 0.9;
+  color: #d1fae5;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.badge-role {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+.badge-role.shopkeeper { background: #fef3c7; color: #92400e; }
+.badge-role.customer { background: #dbeafe; color: #1e40af; }
+
+/* Main Container */
+main {
+  max-width: 1240px;
+  margin: 20px auto;
+  padding: 0 16px 40px;
+  animation: slideUpFade 0.3s ease-out;
+}
+
+/* System Alerts / Notice */
+.notice {
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  border-left: 4px solid #f59e0b;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  color: #92400e;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* Auth Cards */
+.auth-wrap {
+  max-width: 480px;
+  margin: 40px auto;
+  animation: slideDownFade 0.35s ease-out;
+}
+.auth-panel {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: var(--shadow-lg);
+}
+.auth-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 18px 0;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 10px;
+}
+.auth-tabs button {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.auth-tabs button.active {
+  background: white;
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Navigation Tabs inside App */
+.nav-tabs {
+  display: flex;
+  gap: 6px;
+  border-bottom: 2px solid var(--line);
+  margin-bottom: 20px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+.nav-tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 6px 6px 0 0;
+}
+.nav-tab-btn:hover {
+  color: var(--green);
+  background: rgba(21, 128, 61, 0.04);
+}
+.nav-tab-btn.active {
+  color: var(--green);
+  border-bottom-color: var(--green);
+  background: rgba(21, 128, 61, 0.06);
+}
+
+/* Statistics Grid */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.stat {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.stat:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.stat.primary {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-color: #bbf7d0;
+}
+.stat.gold {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border-color: #fde68a;
+}
+.stat span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.stat strong {
+  font-size: clamp(22px, 3.5vw, 30px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  display: block;
+}
+.stat small {
+  display: block;
+  font-size: 12px;
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+/* Panels and Layout */
+.panel {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+}
+.panel h2 {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0 0 16px;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.95fr) minmax(0, 1.45fr);
+  gap: 20px;
+  align-items: start;
+}
+
+/* Forms & Inputs */
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-light);
+  margin: 12px 0 6px;
+}
+input, select, textarea, button {
+  font: inherit;
+}
+input, select, textarea {
+  width: 100%;
+  padding: 10px 13px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: white;
+  color: var(--ink);
+  min-height: 42px;
+  transition: var(--transition);
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.15);
+}
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.three-col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+/* Buttons */
+button {
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 16px;
+  background: var(--green);
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: var(--transition);
+}
+button:hover {
+  background: var(--green-dark);
+  box-shadow: 0 2px 6px rgba(15, 81, 50, 0.25);
+}
+button:active {
+  transform: scale(0.98);
+}
+button.secondary {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+button.secondary:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+  box-shadow: none;
+}
+button.danger {
+  background: var(--red-bg);
+  color: var(--red);
+  border: 1px solid #fca5a5;
+}
+button.danger:hover {
+  background: #fecaca;
+}
+button.gold {
+  background: var(--gold);
+  color: white;
+}
+button.gold:hover {
+  background: #92400e;
+}
+.form-actions, .footer-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+/* Customer Directory Cards */
+.customer-list {
+  display: grid;
+  gap: 10px;
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.customer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  background: white;
+  transition: var(--transition);
+}
+.customer:hover {
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+.customer.active {
+  border-color: var(--green);
+  background: var(--green2);
+  box-shadow: 0 0 0 1px var(--green);
+}
+.customer b {
+  display: block;
+  font-size: 15px;
+  color: var(--ink);
+}
+.customer small {
+  color: var(--muted);
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+}
+.balance {
+  font-weight: 700;
+  font-size: 15px;
+  white-space: nowrap;
+  color: var(--ink);
+}
+.balance.due { color: #b45309; }
+.balance.clear { color: var(--green); }
+
+/* Selected Customer Box */
+.selected-box {
+  background: linear-gradient(135deg, var(--green2) 0%, #e0f2fe 100%);
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+  position: relative;
+}
+.selected-box strong {
+  display: block;
+  font-size: 16px;
+  color: var(--green-deep);
+  margin-bottom: 4px;
+}
+.selected-box .balance-badges {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.badge-pill {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: white;
+  border: 1px solid #cbd5e1;
+}
+
+/* History and Tables */
+.history-wrap {
+  overflow-x: auto;
+  margin-top: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 580px;
+}
+th, td {
+  text-align: left;
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--line);
+}
+th {
+  color: var(--muted);
+  font-weight: 600;
+  background: #f8fafc;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+tbody tr:hover {
+  background: #f8fafc;
+}
+.purchase { color: #b45309; font-weight: 700; }
+.payment { color: var(--green); font-weight: 700; }
+.redemption { color: #7c3aed; font-weight: 700; }
+.empty {
+  color: var(--muted);
+  font-size: 13px;
+  padding: 24px 0;
+  text-align: center;
+}
+
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+  animation: slideDownFade 0.2s ease-out;
+}
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  max-width: 540px;
+  width: 100%;
+  padding: 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Toast Notifications */
+#toastContainer {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9999;
+  pointer-events: none;
+}
+.toast {
+  pointer-events: auto;
+  min-width: 280px;
+  max-width: 400px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: slideUpFade 0.25s ease-out;
+  background: white;
+  border: 1px solid var(--line);
+}
+.toast.success { border-left: 4px solid var(--green); color: var(--green-dark); }
+.toast.error { border-left: 4px solid var(--red); color: var(--red); }
+.toast.info { border-left: 4px solid var(--blue); color: var(--blue); }
+
+/* Customer Family Portal Styles */
+.family-hero {
+  background: linear-gradient(135deg, #064e3b 0%, #047857 100%);
+  color: white;
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-lg);
+}
+.family-hero h2 {
+  font-size: 24px;
+  margin-bottom: 6px;
+}
+.family-balance-big {
+  font-size: clamp(34px, 5vw, 44px);
+  font-weight: 800;
+  margin: 14px 0;
+  letter-spacing: -0.02em;
+}
+.family-chip-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.family-chip {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 12px;
+  backdrop-filter: blur(4px);
+}
+.family-chip span {
+  display: block;
+  font-size: 12px;
+  opacity: 0.85;
+}
+.family-chip strong {
+  display: block;
+  font-size: 18px;
+  margin-top: 2px;
+}
+
+/* Utilities */
+.small { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.topline { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.hidden { display: none !important; }
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; }
+  .two-col, .three-col { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 520px) {
+  .stats { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- Global Toast Container -->
+<div id="toastContainer" aria-live="polite"></div>
+
+<!-- App Header -->
+<header>
+  <div class="wrap">
+    <div class="brand-title">
+      <div class="brand-icon">🛒</div>
+      <div>
+        <h1>Smart Kirana Khata</h1>
+        <p>Digital Grocery Ledger · Shared Family Khata · Loyalty Rewards · Biometric Ready</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <span id="roleIndicator" class="badge-role hidden">Role</span>
+      <button id="biometricLockBtn" class="secondary hidden" type="button" title="Enroll or verify biometric sensor">🔒 Biometric</button>
+      <button id="logoutBtn" class="secondary hidden" type="button">Logout</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Prototype Information / Instructions -->
+  <div class="notice">
+    <div>
+      <b>Smart Kirana Enterprise:</b> Connected to Supabase PostgreSQL database. Supports Shopkeeper Administration, Shared Family Khatas with Row Level Security (RLS), and WebAuthn Biometrics.
+    </div>
+    <span class="small" id="connectionStatusBadge">🟢 Connected</span>
+  </div>
+
+  <!-- AUTHENTICATION SECTION -->
+  <section id="authSection" class="auth-wrap">
+    <div class="auth-panel">
+      <div class="text-center" style="margin-bottom: 16px;">
+        <span style="font-size: 36px;">🏪</span>
+        <h2 id="authTitle" style="margin-top: 6px;">Shopkeeper & Family Login</h2>
+        <p class="small">Sign in to manage your grocery ledger or view your shared family khata account.</p>
+      </div>
+
+      <!-- Auth Role Switcher -->
+      <div class="auth-tabs" role="tablist">
+        <button id="loginTab" class="active" type="button">Shopkeeper Login</button>
+        <button id="signupTab" type="button">Shopkeeper Sign Up</button>
+        <button id="customerAuthTab" type="button">Family Member Login</button>
+      </div>
+
+      <!-- Main Email/Password Auth Form (Used for both shopkeeper and registered family members) -->
+      <form id="authForm">
+        <div id="authEmailGroup">
+          <label for="email" id="emailLabel">Shopkeeper Email</label>
+          <input id="email" type="email" autocomplete="email" required placeholder="shopkeeper@kirana.in">
+        </div>
+
+        <div id="authPasswordGroup">
+          <label for="password">Password</label>
+          <input id="password" type="password" autocomplete="current-password" minlength="6" required placeholder="Minimum 6 characters">
+        </div>
+
+        <!-- Extra details for customer phone/PIN quick login -->
+        <div id="customerQuickFields" class="hidden">
+          <p class="small" style="margin: 10px 0; color: #1e40af; background: #eff6ff; padding: 10px; border-radius: 8px;">
+            💡 Family members: Sign in using your registered mobile email or credentials provided by your kirana shopkeeper.
+          </p>
+        </div>
+
+        <div class="form-actions">
+          <button id="authSubmit" type="submit" style="width: 100%;">Login to Khata</button>
+        </div>
+      </form>
+
+      <!-- Biometric Quick Login Option -->
+      <div id="biometricLoginOption" style="margin-top: 16px; border-top: 1px solid var(--line); padding-top: 14px; text-align: center;">
+        <button id="webAuthnLoginBtn" class="secondary" type="button" style="width: 100%;">
+          <span>👆 Quick Sign In with Fingerprint / Passkey</span>
+        </button>
+      </div>
+
+      <div id="authMessage" role="status" style="margin-top: 14px;"></div>
+    </div>
+  </section>
+
+  <!-- MAIN APPLICATION SECTION (Appears when authenticated) -->
+  <section id="appSection" class="hidden">
+    <!-- Top Signed-in Meta & Role -->
+    <div class="topline" style="margin-bottom: 14px;">
+      <div class="small" id="signedInAs"></div>
+      <div class="small" id="shopNameDisplay" style="font-weight: 600; color: var(--green-dark);"></div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- INTERFACE A: SHOPKEEPER ADMIN DASHBOARD -->
+    <!-- ========================================================================= -->
+    <div id="shopkeeperDashboard" class="hidden">
+      <!-- Admin Navigation Tabs -->
+      <nav class="nav-tabs">
+        <button class="nav-tab-btn active" data-tab="tab-billing" type="button">🛒 Daily Ledger & Udhaar</button>
+        <button class="nav-tab-btn" data-tab="tab-directory" type="button">👥 Customer Directory</button>
+        <button class="nav-tab-btn" data-tab="tab-family" type="button">👨‍👩‍👧‍👦 Family Khata Manager</button>
+        <button class="nav-tab-btn" data-tab="tab-reports" type="button">📊 Sales & Credit Reports</button>
+        <button class="nav-tab-btn" data-tab="tab-audit" type="button">🛡️ Audit & Security</button>
+      </nav>
+
+      <!-- OVERVIEW STATS CARDS -->
+      <section class="stats">
+        <div class="stat primary">
+          <span>📉 Total Outstanding Credit (All Customers)</span>
+          <strong id="totalDue">₹0</strong>
+          <small>Uncollected udhaar balance across shop</small>
+        </div>
+        <div class="stat">
+          <span>👥 Registered Customers</span>
+          <strong id="customerCount">0</strong>
+          <small id="activeCustomerCount">0 active accounts</small>
+        </div>
+        <div class="stat">
+          <span>📅 Purchases This Month</span>
+          <strong id="monthPurchases">₹0</strong>
+          <small id="monthPayments">Payments collected: ₹0</small>
+        </div>
+        <div class="stat gold">
+          <span>🎁 Loyalty Redemptions</span>
+          <strong id="totalPointsRedeemed">0 pts</strong>
+          <small id="totalLoyaltyDiscount">Discounts given: ₹0</small>
+        </div>
+      </section>
+
+      <!-- TAB 1: DAILY LEDGER & BILLING (PRESERVES ORIGINAL WORKFLOW) -->
+      <div id="tab-billing" class="tab-content">
+        <div class="layout">
+          <!-- LEFT COLUMN: ADD CUSTOMER & CUSTOMER SELECTOR -->
+          <section class="panel">
+            <h2><span>1. Add New Customer</span></h2>
+            <form id="customerForm">
+              <label for="customerName">Customer Name *</label>
+              <input id="customerName" required maxlength="60" placeholder="e.g. Rahul Sharma">
+              
+              <div class="two-col">
+                <div>
+                  <label for="customerPhone">Phone Number (10 digits)</label>
+                  <input id="customerPhone" inputmode="tel" maxlength="15" placeholder="e.g. 9876543210">
+                </div>
+                <div>
+                  <label for="customerCreditLimit">Credit Limit (₹)</label>
+                  <input id="customerCreditLimit" type="number" step="100" min="500" value="5000" placeholder="e.g. 5000">
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit">+ Add Customer to Khata</button>
+              </div>
+            </form>
+
+            <hr style="border:0;border-top:1px solid var(--line);margin:20px 0">
+
+            <div class="topline">
+              <h2 style="margin-bottom:0"><span>2. Select Customer</span></h2>
+              <button class="secondary" id="clearSearch" type="button" style="min-height: 32px; padding: 4px 10px; font-size: 12px;">Clear Search</button>
+            </div>
+            
+            <label for="searchCustomer">Search Customer by Name or Phone</label>
+            <input id="searchCustomer" placeholder="Type name or phone number...">
+            
+            <div id="customerList" class="customer-list" style="margin-top:12px"></div>
+            <p class="small" style="margin-top: 10px;">💡 Click a customer to record purchase, payment, or redeem points.</p>
+          </section>
+
+          <!-- RIGHT COLUMN: TRANSACTION ENTRY & REDEMPTION -->
+          <section class="panel">
+            <h2><span>3. Ledger Entry & Udhaar</span></h2>
+            
+            <!-- Selected Customer Snapshot Box -->
+            <div id="selectedBox" class="selected-box">
+              <strong>No customer selected</strong>
+              <span class="small">Add a customer or select one from the left panel.</span>
+            </div>
+
+            <!-- Transaction Form -->
+            <form id="entryForm">
+              <div class="two-col">
+                <div>
+                  <label for="entryType">Entry Type</label>
+                  <select id="entryType">
+                    <option value="purchase">Purchase / Udhaar (+)</option>
+                    <option value="payment">Payment Received (−)</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="entryAmount">Amount (₹) *</label>
+                  <input id="entryAmount" type="number" min="0.01" step="0.01" required placeholder="e.g. 450">
+                </div>
+              </div>
+
+              <label for="entryNote">Description / Bill Note (Optional)</label>
+              <input id="entryNote" maxlength="100" placeholder="e.g. Atta 10kg, Mustard Oil 2L">
+
+              <div class="form-actions">
+                <button type="submit" id="saveEntryBtn">💾 Save Ledger Entry</button>
+              </div>
+            </form>
+
+            <div id="message" role="status" style="margin-top: 10px;"></div>
+
+            <hr style="border:0;border-top:1px solid var(--line);margin:22px 0">
+
+            <!-- Loyalty Points Redemption Section -->
+            <div style="background: var(--gold-bg); padding: 16px; border-radius: 10px; border: 1px solid #fde68a;">
+              <h2 style="margin-bottom: 6px; color: #92400e;">🎁 Redeem Loyalty Points</h2>
+              <p class="small" style="color: #78350f;">
+                Rule: ₹100 eligible purchase = 1 point · 1 point = ₹2 discount. Discount applies directly to reduce outstanding udhaar!
+              </p>
+              
+              <form id="redeemForm" style="margin-top: 10px;">
+                <div class="two-col">
+                  <div>
+                    <label for="redeemPoints" style="color: #92400e;">Points to Redeem *</label>
+                    <input id="redeemPoints" type="number" min="1" step="1" placeholder="e.g. 10">
+                  </div>
+                  <div>
+                    <label for="redeemNote" style="color: #92400e;">Redemption Note</label>
+                    <input id="redeemNote" maxlength="100" placeholder="e.g. Diwali festive discount">
+                  </div>
+                </div>
+
+                <p class="small" id="redeemPreview" style="margin-top: 8px; font-weight: 600; color: #92400e;">
+                  Select a customer to see available points.
+                </p>
+
+                <div class="form-actions">
+                  <button type="submit" class="gold" id="redeemSubmitBtn">Redeem Points & Apply Discount</button>
+                </div>
+              </form>
+            </div>
+
+            <hr style="border:0;border-top:1px solid var(--line);margin:22px 0">
+
+            <!-- Transaction History for Selected Customer -->
+            <div class="topline">
+              <h2 style="margin-bottom:0"><span>4. Transaction History</span></h2>
+              <span class="small" id="historyCustomer" style="font-weight: 600; color: var(--green);"></span>
+            </div>
+
+            <!-- Filter Transactions -->
+            <div class="two-col" style="margin-top: 10px;">
+              <div>
+                <label for="filterTxType">Filter by Type</label>
+                <select id="filterTxType">
+                  <option value="all">All Entries (Purchases, Payments, Discounts)</option>
+                  <option value="purchase">Purchases Only (+)</option>
+                  <option value="payment">Payments Only (−)</option>
+                  <option value="redemption">Loyalty Redemptions Only</option>
+                </select>
+              </div>
+              <div>
+                <label for="filterTxDate">Filter by Date</label>
+                <select id="filterTxDate">
+                  <option value="all">All Time</option>
+                  <option value="today">Today</option>
+                  <option value="month">This Month</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="history" class="history-wrap">
+              <p class="empty">Select a customer to see their transaction ledger.</p>
+            </div>
+
+            <div class="footer-actions">
+              <button class="secondary" id="exportBtn" type="button">📥 Export Ledger to CSV</button>
+              <button class="secondary" id="sendReminderBtn" type="button">📢 Send Payment Reminder Note</button>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- TAB 2: CUSTOMER DIRECTORY -->
+      <div id="tab-directory" class="tab-content hidden">
+        <div class="panel">
+          <div class="topline">
+            <h2><span>Customer Directory & Master Accounts</span></h2>
+            <button class="secondary" id="exportDirectoryCsvBtn" type="button">📥 Export Directory CSV</button>
+          </div>
+          <p class="small">Manage all customer accounts, view contact numbers, credit limits, and activate or deactivate accounts.</p>
+
+          <div style="margin: 16px 0;">
+            <input id="dirSearchInput" placeholder="Filter customer directory by name or phone...">
+          </div>
+
+          <div class="history-wrap">
+            <table id="directoryTable">
+              <thead>
+                <tr>
+                  <th>Customer Name</th>
+                  <th>Phone Number</th>
+                  <th>Credit Limit</th>
+                  <th>Current Udhaar</th>
+                  <th>Loyalty Points</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="directoryTableBody">
+                <tr><td colspan="7" class="empty">Loading customer directory...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: SHARED FAMILY KHATA MANAGER -->
+      <div id="tab-family" class="tab-content hidden">
+        <div class="panel">
+          <h2><span>👨‍👩‍👧‍👦 Shared Family Khata & Household Access</span></h2>
+          <p class="small">
+            One family khata can be accessed by multiple family members (e.g. husband, wife, adult child).
+            Members can view their shared grocery ledger and loyalty points securely with Row Level Security.
+          </p>
+
+          <div class="layout" style="margin-top: 18px;">
+            <!-- Create / Link Family Form -->
+            <div>
+              <h3>Add Family Member Access</h3>
+              <form id="familyMemberForm">
+                <label for="familySelectCustomer">Select Customer / Family Ledger *</label>
+                <select id="familySelectCustomer" required>
+                  <option value="">-- Choose Customer --</option>
+                </select>
+
+                <label for="familyMemberName">Member Full Name *</label>
+                <input id="familyMemberName" required placeholder="e.g. Sunita Devi (Wife)">
+
+                <label for="familyMemberPhone">Member Mobile / Phone *</label>
+                <input id="familyMemberPhone" inputmode="tel" required placeholder="e.g. 9811223344">
+
+                <label for="familyMemberEmail">Member Login Email *</label>
+                <input id="familyMemberEmail" type="email" required placeholder="sunita@example.com">
+
+                <label for="familyMemberRole">Relationship Role</label>
+                <select id="familyMemberRole">
+                  <option value="member">Family Member (Read-only)</option>
+                  <option value="head">Family Head (Authorized)</option>
+                </select>
+
+                <div class="form-actions">
+                  <button type="submit" id="addFamilyMemberBtn">+ Authorize Family Member</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- List of Current Family Links -->
+            <div>
+              <h3>Authorized Family Members List</h3>
+              <div id="familyMembersList" class="history-wrap" style="max-height: 400px; overflow-y: auto;">
+                <p class="empty">No family members registered yet.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: FINANCIAL REPORTS & ANALYTICS -->
+      <div id="tab-reports" class="tab-content hidden">
+        <div class="panel">
+          <h2><span>📊 Kirana Sales & Credit Performance</span></h2>
+          <p class="small">Deterministic real-time ledger accounting metrics calculated directly from verified transactions.</p>
+
+          <div class="stats" style="margin-top: 16px;">
+            <div class="stat">
+              <span>Today's Udhaar Given</span>
+              <strong id="repTodayUdhaar">₹0</strong>
+            </div>
+            <div class="stat">
+              <span>Today's Payments Received</span>
+              <strong id="repTodayPayment">₹0</strong>
+            </div>
+            <div class="stat">
+              <span>Collection Recovery Rate</span>
+              <strong id="repCollectionRate">0%</strong>
+            </div>
+          </div>
+
+          <hr style="border:0;border-top:1px solid var(--line);margin:20px 0">
+
+          <h3>Top Customers with Outstanding Udhaar</h3>
+          <div class="history-wrap" style="margin-top: 12px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Customer Name</th>
+                  <th>Phone</th>
+                  <th>Outstanding Udhaar</th>
+                  <th>Points Balance</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="topDueTableBody">
+                <tr><td colspan="6" class="empty">No customer balances yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: AUDIT LOGS & BIOMETRIC SETTINGS -->
+      <div id="tab-audit" class="tab-content hidden">
+        <div class="panel">
+          <h2><span>🛡️ Security, Audit Trail & Hardware Sensor</span></h2>
+          <p class="small">View ledger integrity logs and enroll biometric fingerprint credentials for this terminal.</p>
+
+          <div class="layout" style="margin-top: 16px;">
+            <div>
+              <h3>Terminal Biometric Scanner (FIDO2 / WebAuthn)</h3>
+              <p class="small">
+                Register this device's integrated fingerprint sensor or USB scanner. Biometric credentials are stored securely in local hardware secure enclave.
+              </p>
+              <div style="margin-top: 12px;">
+                <button id="enrollBiometricBtn" type="button" class="secondary">
+                  👆 Enroll Fingerprint for this Account
+                </button>
+              </div>
+              <p class="small" id="biometricStatusText" style="margin-top: 8px; color: var(--green);">
+                Biometric status: WebAuthn compatible browser verified.
+              </p>
+
+              <hr style="border:0;border-top:1px solid var(--line);margin:20px 0">
+
+              <h3>Dedicated Shop Hardware Integration</h3>
+              <p class="small">
+                For standalone mini-PC setup with Mantra / SecuGen / Morpho USB optical readers, connect our local hardware daemon service:
+              </p>
+              <div style="background: #f1f5f9; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 12px; margin-top: 8px;">
+                Local Sensor Daemon: http://127.0.0.1:9443
+              </div>
+            </div>
+
+            <div>
+              <h3>Ledger Security Audit Trail</h3>
+              <div class="history-wrap" style="max-height: 380px; overflow-y: auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Timestamp</th>
+                      <th>Action</th>
+                      <th>Details</th>
+                    </tr>
+                  </thead>
+                  <tbody id="auditLogsTableBody">
+                    <tr><td colspan="3" class="empty">Audit trail active. Every payment, purchase and redemption is recorded.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- INTERFACE B: CUSTOMER & SHARED FAMILY DASHBOARD -->
+    <!-- ========================================================================= -->
+    <div id="customerDashboard" class="hidden">
+      <!-- Family Khata Hero Banner -->
+      <div class="family-hero">
+        <div class="topline">
+          <div>
+            <span class="badge-role customer">Authorized Family Member</span>
+            <h2 id="custFamilyTitle" style="margin-top: 8px;">Welcome to Your Family Khata</h2>
+            <p id="custShopName" style="opacity: 0.9; font-size: 14px;">Kirana Store Ledger Account</p>
+          </div>
+          <button id="custRefreshBtn" class="secondary" type="button" style="background: rgba(255,255,255,0.2); color: white; border: none;">
+            🔄 Refresh Khata
+          </button>
+        </div>
+
+        <!-- Huge Outstanding Balance Highlight -->
+        <div style="margin-top: 20px;">
+          <span style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.85;">Current Outstanding Udhaar Balance</span>
+          <div class="family-balance-big" id="custBalanceDue">₹0</div>
+          <small style="opacity: 0.9;">Payable to your neighbourhood grocery shopkeeper</small>
+        </div>
+
+        <!-- Summary Chip Grid -->
+        <div class="family-chip-grid">
+          <div class="family-chip">
+            <span>🎁 Available Loyalty Points</span>
+            <strong id="custLoyaltyPoints">0 Points</strong>
+            <small id="custDiscountValue" style="font-size: 11px; opacity: 0.9;">Worth ₹0 discount</small>
+          </div>
+          <div class="family-chip">
+            <span>🛒 Total Purchases Recorded</span>
+            <strong id="custTotalPurchases">₹0</strong>
+          </div>
+          <div class="family-chip">
+            <span>💵 Total Payments Cleared</span>
+            <strong id="custTotalPayments">₹0</strong>
+          </div>
+          <div class="family-chip">
+            <span>🎉 Total Loyalty Savings</span>
+            <strong id="custTotalDiscounts">₹0</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Reminders & Notices -->
+      <div id="custReminderNotice" class="notice hidden">
+        <div>
+          <b>Shopkeeper Notice:</b> <span id="custReminderText">Please settle previous grocery dues before month end.</span>
+        </div>
+      </div>
+
+      <!-- Family Members List & Ledger -->
+      <div class="layout">
+        <!-- Transaction Statement -->
+        <div class="panel">
+          <div class="topline">
+            <h2><span>📋 Family Khata Statement</span></h2>
+            <button class="secondary" id="custExportCsvBtn" type="button" style="min-height: 32px; padding: 4px 12px; font-size: 13px;">📥 Download Statement (CSV)</button>
+          </div>
+          <p class="small">Complete verified record of grocery items bought, payments made, and loyalty discounts applied.</p>
+
+          <div id="custHistoryWrap" class="history-wrap" style="margin-top: 14px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date & Time</th>
+                  <th>Entry Type</th>
+                  <th>Amount / Discount</th>
+                  <th>Bill Description</th>
+                </tr>
+              </thead>
+              <tbody id="custHistoryTableBody">
+                <tr><td colspan="4" class="empty">No entries in this family khata yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Authorized Family Members & Contact Info -->
+        <div>
+          <div class="panel">
+            <h2><span>👨‍👩‍👧 Authorized Members on this Khata</span></h2>
+            <p class="small">The following household members have access to view this shared family khata:</p>
+            <div id="custFamilyMemberList" style="margin-top: 12px;" class="customer-list">
+              <p class="empty">Loading family members...</p>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2><span>🏪 Shopkeeper Contact Information</span></h2>
+            <p class="small">Contact your grocery shopkeeper for bill clarifications or to settle udhaar dues:</p>
+            <div style="margin-top: 12px; font-size: 14px; line-height: 1.8;">
+              <div>🏬 <b id="shopContactName">Smart Kirana Store</b></div>
+              <div>📞 Phone: <span id="shopContactPhone">+91 (Contact in shop)</span></div>
+              <div>📍 Address: <span id="shopContactAddress">Local Neighbourhood Market</span></div>
+              <div style="margin-top: 8px;">💳 Accepted: Cash, UPI, Google Pay, PhonePe, Paytm</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- EDIT CUSTOMER MODAL -->
+<div id="editCustomerModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+  <div class="modal-content">
+    <div class="topline">
+      <h2>Edit Customer Account</h2>
+      <button type="button" class="secondary" id="closeEditModalBtn" style="min-height: 32px; padding: 4px 10px;">✕</button>
+    </div>
+    <form id="editCustomerForm" style="margin-top: 14px;">
+      <input type="hidden" id="editCustomerId">
+      <label for="editCustomerName">Customer Name *</label>
+      <input id="editCustomerName" required>
+
+      <label for="editCustomerPhone">Phone Number</label>
+      <input id="editCustomerPhone" inputmode="tel">
+
+      <label for="editCreditLimit">Credit Limit (₹)</label>
+      <input id="editCreditLimit" type="number" step="100">
+
+      <label for="editCustomerNotes">Shopkeeper Internal Notes</label>
+      <textarea id="editCustomerNotes" rows="2" placeholder="e.g. Regular monthly customer"></textarea>
+
+      <div class="form-actions">
+        <button type="submit">Save Changes</button>
+        <button type="button" class="secondary" id="cancelEditModalBtn">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- JAVASCRIPT APPLICATION LOGIC -->
+<script>
+(() => {
+  // SUPABASE CONFIGURATION
+  // Preserving original verified project credentials
+  const SUPABASE_URL = 'https://gucdexxausukkigxvuuq.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_3Vzrxneqf6-lL34DJPT6Pg_Cd4BWyY5';
+
+  // DOM helper
+  const $ = id => document.getElementById(id);
+  
+  // Format Indian Currency & Numbering
+  const money = n => new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 2
+  }).format(n || 0);
+
+  // HTML sanitizer
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+
+  // CSV cell sanitizer (Prevents CSV formula injection for =, +, -, @)
+  const sanitizeCsvCell = val => {
+    let s = String(val ?? '').trim();
+    if (/^[=+\-@\t\r]/.test(s)) {
+      s = "'" + s; // neutralize spreadsheet formula
+    }
+    return `"${s.replace(/"/g, '""')}"`;
+  };
+
+  // State
+  let supabase = null;
+  let session = null;
+  let currentUserRole = 'shopkeeper'; // 'shopkeeper' or 'customer'
+  let customers = [];
+  let transactions = [];
+  let redemptions = [];
+  let familyMembers = [];
+  let auditLogs = [];
+  let selectedId = null;
+  let authMode = 'login'; // 'login', 'signup', or 'customer'
+
+  // Toast System
+  function showToast(text, type = 'success') {
+    const container = $('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+    toast.innerHTML = `<span>${icon}</span> <span>${esc(text)}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(10px)';
+      toast.style.transition = 'all 0.3s ease';
+      setTimeout(() => toast.remove(), 300);
+    }, 4000);
+  }
+
+  function message(el, text, isError = false) {
+    const elem = $(el);
+    if (!elem) return;
+    elem.textContent = text;
+    elem.style.color = isError ? 'var(--red)' : 'var(--green)';
+    if (text) showToast(text, isError ? 'error' : 'success');
+  }
+
+  // Set Auth Mode
+  function setAuthMode(mode) {
+    authMode = mode;
+    $('loginTab').classList.toggle('active', mode === 'login');
+    $('signupTab').classList.toggle('active', mode === 'signup');
+    $('customerAuthTab').classList.toggle('active', mode === 'customer');
+
+    if (mode === 'login') {
+      $('authTitle').textContent = 'Shopkeeper Login';
+      $('authSubmit').textContent = 'Login as Shopkeeper';
+      $('emailLabel').textContent = 'Shopkeeper Email';
+      $('email').placeholder = 'shopkeeper@kirana.in';
+      $('customerQuickFields').classList.add('hidden');
+    } else if (mode === 'signup') {
+      $('authTitle').textContent = 'Create Shopkeeper Account';
+      $('authSubmit').textContent = 'Create Shopkeeper Account';
+      $('emailLabel').textContent = 'Shopkeeper Email';
+      $('email').placeholder = 'shopkeeper@kirana.in';
+      $('customerQuickFields').classList.add('hidden');
+    } else if (mode === 'customer') {
+      $('authTitle').textContent = 'Family Member Khata Login';
+      $('authSubmit').textContent = 'Access Family Khata';
+      $('emailLabel').textContent = 'Registered Member Email / Login ID';
+      $('email').placeholder = 'member@example.com';
+      $('customerQuickFields').classList.remove('hidden');
+    }
+    message('authMessage', '');
+  }
+
+  // Update UI Visibility Based on Signed-in User
+  function showSignedIn(isIn) {
+    $('authSection').classList.toggle('hidden', isIn);
+    $('appSection').classList.toggle('hidden', !isIn);
+    $('logoutBtn').classList.toggle('hidden', !isIn);
+    $('biometricLockBtn').classList.toggle('hidden', !isIn);
+    $('roleIndicator').classList.toggle('hidden', !isIn);
+
+    if (isIn && session?.user) {
+      $('signedInAs').textContent = `Signed in as: ${session.user.email || session.user.id.slice(0, 8)}`;
+      $('roleIndicator').textContent = currentUserRole === 'shopkeeper' ? 'Shopkeeper Admin' : 'Family Member';
+      $('roleIndicator').className = `badge-role ${currentUserRole}`;
+      
+      $('shopkeeperDashboard').classList.toggle('hidden', currentUserRole !== 'shopkeeper');
+      $('customerDashboard').classList.toggle('hidden', currentUserRole !== 'customer');
+    } else {
+      $('signedInAs').textContent = '';
+      $('shopkeeperDashboard').classList.add('hidden');
+      $('customerDashboard').classList.add('hidden');
+    }
+  }
+
+  // Detect whether current session is Shopkeeper or Family Customer
+  async function detectUserRole() {
+    if (!session?.user) return 'shopkeeper';
+    try {
+      // Check if user is linked to family_members table
+      const { data: fmData, error: fmErr } = await supabase
+        .from('family_members')
+        .select('id, family_id, role, status')
+        .eq('user_id', session.user.id)
+        .eq('status', 'active')
+        .limit(1);
+
+      if (!fmErr && fmData && fmData.length > 0) {
+        currentUserRole = 'customer';
+        return 'customer';
+      }
+    } catch (e) {
+      // fallback
+    }
+    currentUserRole = 'shopkeeper';
+    return 'shopkeeper';
+  }
+
+  // Calculations
+  function customerTransactions(c) {
+    return transactions.filter(t => String(t.customer_id) === String(c.id));
+  }
+  function customerRedemptions(c) {
+    return redemptions.filter(r => String(r.customer_id) === String(c.id));
+  }
+  function balance(c) {
+    const ledger = customerTransactions(c).reduce((sum, t) => sum + (t.type === 'purchase' ? t.amount : -t.amount), 0);
+    const discounts = customerRedemptions(c).reduce((sum, r) => sum + Number(r.discount_amount || 0), 0);
+    return Math.max(0, ledger - discounts);
+  }
+  function earnedPoints(c) {
+    return Math.floor(customerTransactions(c).filter(t => t.type === 'purchase').reduce((s, t) => s + t.amount, 0) / 100);
+  }
+  function points(c) {
+    return Math.max(0, earnedPoints(c) - customerRedemptions(c).reduce((s, r) => s + r.points_used, 0));
+  }
+
+  // Refresh All Data from Supabase
+  async function refreshData() {
+    if (!session?.user) return;
+    await detectUserRole();
+    showSignedIn(true);
+
+    if (currentUserRole === 'shopkeeper') {
+      await refreshShopkeeperData();
+    } else {
+      await refreshCustomerData();
+    }
+  }
+
+  // Refresh Shopkeeper Admin Data
+  async function refreshShopkeeperData() {
+    try {
+      // Fetch customers belonging to this shopkeeper
+      const { data: cData, error: cErr } = await supabase
+        .from('customers')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (cErr) throw cErr;
+      customers = (cData || []).map(c => ({
+        ...c,
+        phone: c.phone || '',
+        credit_limit: Number(c.credit_limit || 5000),
+        is_active: c.is_active !== false
+      }));
+
+      const ids = customers.map(c => c.id);
+      if (ids.length) {
+        // Fetch transactions
+        const { data: tData, error: tErr } = await supabase
+          .from('transactions')
+          .select('*')
+          .in('customer_id', ids)
+          .order('created_at', { ascending: true });
+        if (tErr) throw tErr;
+        transactions = (tData || []).map(t => ({
+          ...t,
+          amount: Number(t.amount),
+          note: t.note || '',
+          date: t.created_at || new Date().toISOString()
+        }));
+
+        // Fetch redemptions
+        const { data: rData, error: rErr } = await supabase
+          .from('loyalty_redemptions')
+          .select('*')
+          .in('customer_id', ids)
+          .order('created_at', { ascending: true });
+        if (rErr) throw rErr;
+        redemptions = (rData || []).map(r => ({
+          ...r,
+          points_used: Number(r.points_used),
+          discount_amount: Number(r.discount_amount),
+          note: r.note || '',
+          date: r.created_at || new Date().toISOString()
+        }));
+
+        // Try fetching family members if table exists
+        try {
+          const { data: fmData } = await supabase.from('family_members').select('*');
+          familyMembers = fmData || [];
+        } catch (_) {}
+      } else {
+        transactions = [];
+        redemptions = [];
+      }
+
+      if (!customers.some(c => c.id === selectedId)) {
+        selectedId = customers.length ? customers[0].id : null;
+      }
+
+      renderShopkeeper();
+    } catch (err) {
+      console.error(err);
+      message('message', `Could not refresh data: ${err.message}`, true);
+    }
+  }
+
+  // Refresh Customer Family Data
+  async function refreshCustomerData() {
+    try {
+      // For customer user, RLS policies only allow viewing their own authorized customer/family records!
+      const { data: cData, error: cErr } = await supabase.from('customers').select('*');
+      if (cErr) throw cErr;
+
+      customers = cData || [];
+      const ids = customers.map(c => c.id);
+
+      if (ids.length) {
+        const { data: tData } = await supabase.from('transactions').select('*').in('customer_id', ids).order('created_at', { ascending: false });
+        transactions = (tData || []).map(t => ({
+          ...t,
+          amount: Number(t.amount),
+          note: t.note || '',
+          date: t.created_at || new Date().toISOString()
+        }));
+
+        const { data: rData } = await supabase.from('loyalty_redemptions').select('*').in('customer_id', ids).order('created_at', { ascending: false });
+        redemptions = (rData || []).map(r => ({
+          ...r,
+          points_used: Number(r.points_used),
+          discount_amount: Number(r.discount_amount),
+          note: r.note || '',
+          date: r.created_at || new Date().toISOString()
+        }));
+
+        try {
+          const { data: fmData } = await supabase.from('family_members').select('*');
+          familyMembers = fmData || [];
+        } catch (_) {}
+      }
+
+      renderCustomerView();
+    } catch (err) {
+      console.error('Customer data load error:', err);
+      showToast(`Error loading family khata: ${err.message}`, 'error');
+    }
+  }
+
+  // Render Shopkeeper UI
+  function renderShopkeeper() {
+    // 1. Calculate Summary Stats
+    const totalDue = customers.reduce((sum, c) => sum + balance(c), 0);
+    const now = new Date();
+    const currentMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+    
+    const monthlyPurchases = transactions
+      .filter(t => t.type === 'purchase' && String(t.date).slice(0, 7) === currentMonth)
+      .reduce((s, t) => s + t.amount, 0);
+
+    const monthlyPayments = transactions
+      .filter(t => t.type === 'payment' && String(t.date).slice(0, 7) === currentMonth)
+      .reduce((s, t) => s + t.amount, 0);
+
+    const totalPointsRedeemedCount = redemptions.reduce((s, r) => s + r.points_used, 0);
+    const totalDiscountAmount = redemptions.reduce((s, r) => s + r.discount_amount, 0);
+
+    $('totalDue').textContent = money(totalDue);
+    $('customerCount').textContent = customers.length;
+    $('activeCustomerCount').textContent = `${customers.filter(c => c.is_active).length} active accounts`;
+    $('monthPurchases').textContent = money(monthlyPurchases);
+    $('monthPayments').textContent = `Payments collected: ${money(monthlyPayments)}`;
+    $('totalPointsRedeemed').textContent = `${totalPointsRedeemedCount} pts`;
+    $('totalLoyaltyDiscount').textContent = `Discounts given: ${money(totalDiscountAmount)}`;
+
+    // Render Sub-sections
+    renderCustomersList();
+    renderSelectedBox();
+    renderDirectoryTable();
+    renderFamilyManager();
+    renderReports();
+  }
+
+  // Render Customer Selector List
+  function renderCustomersList() {
+    const query = $('searchCustomer').value.trim().toLowerCase();
+    const list = customers.filter(c =>
+      c.is_active &&
+      ((c.name || '').toLowerCase().includes(query) || (c.phone || '').toLowerCase().includes(query))
+    );
+
+    $('customerList').innerHTML = list.length
+      ? list.map(c => {
+          const b = balance(c);
+          const p = points(c);
+          const isSelected = String(c.id) === String(selectedId);
+          return `
+            <div class="customer ${isSelected ? 'active' : ''}" data-id="${esc(c.id)}" tabindex="0" role="button">
+              <div>
+                <b>${esc(c.name)}</b>
+                <small>${esc(c.phone || 'No phone')} · 🎁 ${p} points (₹${p * 2})</small>
+              </div>
+              <div class="balance ${b > 0 ? 'due' : 'clear'}">${money(b)}</div>
+            </div>
+          `;
+        }).join('')
+      : '<p class="empty">No matching active customers found.</p>';
+
+    $('customerList').querySelectorAll('.customer').forEach(el => {
+      const choose = () => {
+        selectedId = el.dataset.id;
+        message('message', '');
+        renderShopkeeper();
+      };
+      el.addEventListener('click', choose);
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          choose();
+        }
+      });
+    });
+  }
+
+  // Render Selected Customer Snapshot & History
+  function renderSelectedBox() {
+    const c = customers.find(x => String(x.id) === String(selectedId));
+    if (!c) {
+      $('selectedBox').innerHTML = '<strong>No customer selected</strong><span class="small">Add a customer or select one from the list.</span>';
+      $('historyCustomer').textContent = '';
+      $('history').innerHTML = '<p class="empty">Select a customer to see transactions.</p>';
+      $('redeemPreview').textContent = 'Select a customer to see available points.';
+      return;
+    }
+
+    const curBalance = balance(c);
+    const curPoints = points(c);
+    const maxDiscount = curPoints * 2;
+
+    $('selectedBox').innerHTML = `
+      <div class="topline">
+        <strong>${esc(c.name)}</strong>
+        <span class="badge-pill" style="background: ${curBalance > 0 ? '#fee2e2' : '#dcfce7'}; color: ${curBalance > 0 ? '#b91c1c' : '#15803d'}">
+          ${curBalance > 0 ? 'Udhaar Due' : 'All Cleared'}
+        </span>
+      </div>
+      <span class="small">📞 ${esc(c.phone || 'No mobile')} · Limit: ${money(c.credit_limit)}</span>
+      <div class="balance-badges">
+        <span class="badge-pill">Outstanding Udhaar: <b>${money(curBalance)}</b></span>
+        <span class="badge-pill" style="background:#fef3c7; color:#92400e;">Available Points: <b>${curPoints}</b> (₹${maxDiscount})</span>
+      </div>
+    `;
+
+    $('historyCustomer').textContent = `${c.name} (${c.phone || 'No phone'})`;
+    $('redeemPreview').textContent = `Available: ${curPoints} points · Max discount: ${money(maxDiscount)} · Remaining bill: ${money(curBalance)}`;
+
+    // Render Filtered History
+    const typeFilter = $('filterTxType') ? $('filterTxType').value : 'all';
+    const dateFilter = $('filterTxDate') ? $('filterTxDate').value : 'all';
+
+    let txRows = customerTransactions(c).map(t => ({
+      date: t.date,
+      type: t.type,
+      html: `
+        <tr>
+          <td>${esc(new Date(t.date).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }))}</td>
+          <td class="${esc(t.type)}">${t.type === 'purchase' ? '🛒 Purchase / Udhaar (+)' : '💵 Payment Received (−)'}</td>
+          <td><b>${money(t.amount)}</b></td>
+          <td>${esc(t.note || '—')}</td>
+        </tr>
+      `
+    }));
+
+    let rdRows = customerRedemptions(c).map(r => ({
+      date: r.date,
+      type: 'redemption',
+      html: `
+        <tr>
+          <td>${esc(new Date(r.date).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }))}</td>
+          <td class="redemption">🎁 Points Redeemed (−${r.points_used} pts)</td>
+          <td><b>${money(r.discount_amount)}</b></td>
+          <td>${esc(r.note || 'Loyalty points discount applied')}</td>
+        </tr>
+      `
+    }));
+
+    let allRows = [...txRows, ...rdRows];
+
+    // Filter by type
+    if (typeFilter !== 'all') {
+      allRows = allRows.filter(r => r.type === typeFilter);
+    }
+
+    // Filter by date
+    if (dateFilter === 'today') {
+      const todayStr = new Date().toISOString().slice(0, 10);
+      allRows = allRows.filter(r => String(r.date).slice(0, 10) === todayStr);
+    } else if (dateFilter === 'month') {
+      const thisMonth = new Date().toISOString().slice(0, 7);
+      allRows = allRows.filter(r => String(r.date).slice(0, 7) === thisMonth);
+    }
+
+    allRows.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    $('history').innerHTML = allRows.length
+      ? `<table>
+          <thead>
+            <tr>
+              <th>Date & Time</th>
+              <th>Type</th>
+              <th>Amount / Discount</th>
+              <th>Description / Note</th>
+            </tr>
+          </thead>
+          <tbody>${allRows.map(r => r.html).join('')}</tbody>
+        </table>`
+      : '<p class="empty">No entries found matching filters for this customer.</p>';
+  }
+
+  // Render Master Customer Directory Table
+  function renderDirectoryTable() {
+    const q = $('dirSearchInput') ? $('dirSearchInput').value.trim().toLowerCase() : '';
+    const filtered = customers.filter(c =>
+      (c.name || '').toLowerCase().includes(q) || (c.phone || '').toLowerCase().includes(q)
+    );
+
+    const tbody = $('directoryTableBody');
+    if (!tbody) return;
+
+    if (!filtered.length) {
+      tbody.innerHTML = '<tr><td colspan="7" class="empty">No customers found.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = filtered.map(c => {
+      const b = balance(c);
+      const p = points(c);
+      return `
+        <tr>
+          <td><b>${esc(c.name)}</b></td>
+          <td>${esc(c.phone || '—')}</td>
+          <td>${money(c.credit_limit)}</td>
+          <td class="${b > 0 ? 'purchase' : 'payment'}">${money(b)}</td>
+          <td>🎁 ${p} (₹${p * 2})</td>
+          <td>
+            <span class="badge-pill" style="background:${c.is_active ? '#dcfce7' : '#fee2e2'}; color:${c.is_active ? '#15803d' : '#b91c1c'};">
+              ${c.is_active ? 'Active' : 'Deactivated'}
+            </span>
+          </td>
+          <td>
+            <button class="secondary edit-cust-btn" data-id="${esc(c.id)}" style="min-height: 28px; padding: 2px 8px; font-size: 11px;">Edit</button>
+            <button class="secondary toggle-status-btn" data-id="${esc(c.id)}" data-active="${c.is_active}" style="min-height: 28px; padding: 2px 8px; font-size: 11px;">
+              ${c.is_active ? 'Deactivate' : 'Reactivate'}
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    // Attach actions
+    tbody.querySelectorAll('.edit-cust-btn').forEach(btn => {
+      btn.addEventListener('click', () => openEditCustomerModal(btn.dataset.id));
+    });
+    tbody.querySelectorAll('.toggle-status-btn').forEach(btn => {
+      btn.addEventListener('click', () => toggleCustomerActiveStatus(btn.dataset.id, btn.dataset.active === 'true'));
+    });
+  }
+
+  // Render Family Manager
+  function renderFamilyManager() {
+    const select = $('familySelectCustomer');
+    if (!select) return;
+
+    select.innerHTML = '<option value="">-- Choose Customer Khata --</option>' +
+      customers.map(c => `<option value="${esc(c.id)}">${esc(c.name)} (${esc(c.phone || 'No phone')})</option>`).join('');
+
+    const list = $('familyMembersList');
+    if (!list) return;
+
+    if (!familyMembers.length) {
+      list.innerHTML = '<p class="empty">No family members registered yet. Authorize a member above.</p>';
+      return;
+    }
+
+    list.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Member Name</th>
+            <th>Phone / Login</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${familyMembers.map(fm => `
+            <tr>
+              <td><b>${esc(fm.member_name)}</b></td>
+              <td>${esc(fm.phone || fm.email || '—')}</td>
+              <td><span class="badge-role">${esc(fm.role || 'member')}</span></td>
+              <td>
+                <span class="badge-pill" style="background:${fm.status === 'active' ? '#dcfce7' : '#fee2e2'}">
+                  ${esc(fm.status)}
+                </span>
+              </td>
+              <td>
+                <button class="danger revoke-fm-btn" data-id="${esc(fm.id)}" style="min-height: 28px; padding: 2px 8px; font-size: 11px;">
+                  Revoke Access
+                </button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+
+    list.querySelectorAll('.revoke-fm-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('Are you sure you want to revoke this family member access?')) return;
+        try {
+          const { error } = await supabase.from('family_members').update({ status: 'revoked' }).eq('id', btn.dataset.id);
+          if (error) throw error;
+          showToast('Family member access revoked.');
+          await refreshData();
+        } catch (e) {
+          showToast(`Could not revoke: ${e.message}`, 'error');
+        }
+      });
+    });
+  }
+
+  // Render Financial Reports
+  function renderReports() {
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const todayPurchases = transactions
+      .filter(t => t.type === 'purchase' && String(t.date).slice(0, 10) === todayStr)
+      .reduce((s, t) => s + t.amount, 0);
+
+    const todayPayments = transactions
+      .filter(t => t.type === 'payment' && String(t.date).slice(0, 10) === todayStr)
+      .reduce((s, t) => s + t.amount, 0);
+
+    const totalUdhaar = transactions.filter(t => t.type === 'purchase').reduce((s, t) => s + t.amount, 0);
+    const totalPayments = transactions.filter(t => t.type === 'payment').reduce((s, t) => s + t.amount, 0);
+    const recoveryRate = totalUdhaar > 0 ? Math.round((totalPayments / totalUdhaar) * 100) : 100;
+
+    if ($('repTodayUdhaar')) $('repTodayUdhaar').textContent = money(todayPurchases);
+    if ($('repTodayPayment')) $('repTodayPayment').textContent = money(todayPayments);
+    if ($('repCollectionRate')) $('repCollectionRate').textContent = `${recoveryRate}%`;
+
+    // Top customers with outstanding balance
+    const sorted = [...customers]
+      .map(c => ({ ...c, due: balance(c), pts: points(c) }))
+      .filter(c => c.due > 0)
+      .sort((a, b) => b.due - a.due)
+      .slice(0, 10);
+
+    const tbody = $('topDueTableBody');
+    if (tbody) {
+      tbody.innerHTML = sorted.length
+        ? sorted.map((c, i) => `
+            <tr>
+              <td>#${i + 1}</td>
+              <td><b>${esc(c.name)}</b></td>
+              <td>${esc(c.phone || '—')}</td>
+              <td class="purchase">${money(c.due)}</td>
+              <td>🎁 ${c.pts}</td>
+              <td>
+                <button class="secondary select-top-btn" data-id="${esc(c.id)}" style="min-height: 28px; padding: 2px 8px; font-size: 11px;">
+                  Open Khata
+                </button>
+              </td>
+            </tr>
+          `).join('')
+        : '<tr><td colspan="6" class="empty">Great news! All customer balances are currently settled.</td></tr>';
+
+      tbody.querySelectorAll('.select-top-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedId = btn.dataset.id;
+          document.querySelector('[data-tab="tab-billing"]').click();
+          renderShopkeeper();
+        });
+      });
+    }
+  }
+
+  // Render Customer & Shared Family View
+  function renderCustomerView() {
+    if (!customers.length) {
+      $('custBalanceDue').textContent = '₹0';
+      $('custFamilyTitle').textContent = 'Family Khata Account';
+      $('custHistoryTableBody').innerHTML = '<tr><td colspan="4" class="empty">No khata records linked to your account.</td></tr>';
+      return;
+    }
+
+    const c = customers[0]; // Authorized customer account
+    const curBalance = balance(c);
+    const curPoints = points(c);
+    const totalPurchases = customerTransactions(c).filter(t => t.type === 'purchase').reduce((s, t) => s + t.amount, 0);
+    const totalPayments = customerTransactions(c).filter(t => t.type === 'payment').reduce((s, t) => s + t.amount, 0);
+    const totalDiscounts = customerRedemptions(c).reduce((s, r) => s + r.discount_amount, 0);
+
+    $('custFamilyTitle').textContent = `Family Khata: ${c.name}`;
+    $('custBalanceDue').textContent = money(curBalance);
+    $('custLoyaltyPoints').textContent = `${curPoints} Points`;
+    $('custDiscountValue').textContent = `Worth ${money(curPoints * 2)} discount on your bill`;
+    $('custTotalPurchases').textContent = money(totalPurchases);
+    $('custTotalPayments').textContent = money(totalPayments);
+    $('custTotalDiscounts').textContent = money(totalDiscounts);
+
+    // Show reminder if balance > 0
+    if (curBalance > 0) {
+      $('custReminderNotice').classList.remove('hidden');
+      $('custReminderText').textContent = `You have an outstanding bill of ${money(curBalance)}. Kindly settle at your convenience in shop or via UPI.`;
+    } else {
+      $('custReminderNotice').classList.add('hidden');
+    }
+
+    // Render Transaction History
+    const allRows = [
+      ...customerTransactions(c).map(t => ({
+        date: t.date,
+        html: `
+          <tr>
+            <td>${esc(new Date(t.date).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }))}</td>
+            <td class="${esc(t.type)}">${t.type === 'purchase' ? '🛒 Grocery Purchase (+)' : '💵 Payment Made (−)'}</td>
+            <td><b>${money(t.amount)}</b></td>
+            <td>${esc(t.note || '—')}</td>
+          </tr>
+        `
+      })),
+      ...customerRedemptions(c).map(r => ({
+        date: r.date,
+        html: `
+          <tr>
+            <td>${esc(new Date(r.date).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }))}</td>
+            <td class="redemption">🎁 Points Discount (−${r.points_used} pts)</td>
+            <td><b>${money(r.discount_amount)}</b></td>
+            <td>${esc(r.note || 'Loyalty redemption discount applied')}</td>
+          </tr>
+        `
+      }))
+    ].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    $('custHistoryTableBody').innerHTML = allRows.length
+      ? allRows.map(r => r.html).join('')
+      : '<tr><td colspan="4" class="empty">No entries in this family khata yet.</td></tr>';
+
+    // Family Member Badges
+    const fmList = $('custFamilyMemberList');
+    if (fmList) {
+      fmList.innerHTML = `
+        <div class="customer" style="cursor: default;">
+          <div>
+            <b>${esc(c.name)}</b>
+            <small>Primary Account Holder · Active</small>
+          </div>
+          <span class="badge-pill" style="background:#dcfce7; color:#15803d;">Active</span>
+        </div>
+      `;
+    }
+  }
+
+  // EVENT HANDLERS & OPERATIONS
+
+  // Navigation Tabs Switching
+  document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(tc => tc.classList.add('hidden'));
+      btn.classList.add('active');
+      const target = $(btn.dataset.tab);
+      if (target) target.classList.remove('hidden');
+    });
+  });
+
+  // Auth Handling
+  $('loginTab').addEventListener('click', () => setAuthMode('login'));
+  $('signupTab').addEventListener('click', () => setAuthMode('signup'));
+  $('customerAuthTab').addEventListener('click', () => setAuthMode('customer'));
+
+  $('authForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    message('authMessage', 'Authenticating, please wait…');
+    const email = $('email').value.trim();
+    const password = $('password').value;
+
+    try {
+      let result;
+      if (authMode === 'signup') {
+        result = await supabase.auth.signUp({ email, password });
+        if (result.error) throw result.error;
+        if (!result.data.session) {
+          message('authMessage', 'Account registered! Please check your email to verify before logging in.');
+          return;
+        }
+      } else {
+        result = await supabase.auth.signInWithPassword({ email, password });
+        if (result.error) throw result.error;
+      }
+
+      session = result.data.session;
+      if (session) {
+        message('authMessage', '');
+        await refreshData();
+        showToast('Successfully signed in.');
+      }
+    } catch (err) {
+      console.error(err);
+      message('authMessage', err.message || 'Authentication failed. Please verify credentials.', true);
+    }
+  });
+
+  // Logout
+  $('logoutBtn').addEventListener('click', async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      message('message', error.message, true);
+      return;
+    }
+    session = null;
+    customers = [];
+    transactions = [];
+    redemptions = [];
+    selectedId = null;
+    showSignedIn(false);
+    setAuthMode('login');
+    showToast('Signed out securely.');
+  });
+
+  // Add Customer Form
+  $('customerForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const name = $('customerName').value.trim();
+    const phone = $('customerPhone').value.trim();
+    const creditLimit = Number($('customerCreditLimit').value) || 5000;
+
+    if (!name) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('customers')
+        .insert({
+          name,
+          phone: phone || null,
+          owner_id: session.user.id,
+          credit_limit: creditLimit,
+          is_active: true
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      selectedId = data.id;
+      $('customerForm').reset();
+      $('customerCreditLimit').value = '5000';
+      message('message', `Customer "${name}" registered successfully.`);
+      await refreshData();
+    } catch (err) {
+      console.error(err);
+      message('message', `Could not add customer: ${err.message}`, true);
+    }
+  });
+
+  // Record Transaction (Purchase / Payment)
+  $('entryForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const c = customers.find(x => String(x.id) === String(selectedId));
+    if (!c) {
+      message('message', 'Please select a customer first.', true);
+      return;
+    }
+
+    const type = $('entryType').value;
+    const amount = Number($('entryAmount').value);
+    const note = $('entryNote').value.trim();
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      message('message', 'Enter an amount greater than ₹0.', true);
+      return;
+    }
+
+    // Strict validation: payment cannot exceed outstanding balance!
+    const curBalance = balance(c);
+    if (type === 'payment' && amount > curBalance) {
+      message('message', `Payment of ${money(amount)} exceeds current outstanding balance of ${money(curBalance)}.`, true);
+      return;
+    }
+
+    try {
+      // Try atomic RPC if available, or direct insert fallback
+      let rpcSucceeded = false;
+      try {
+        const { data: rpcData, error: rpcErr } = await supabase.rpc('record_transaction_secure', {
+          p_customer_id: c.id,
+          p_type: type,
+          p_amount: amount,
+          p_note: note || null
+        });
+        if (!rpcErr && rpcData?.success) {
+          rpcSucceeded = true;
+        }
+      } catch (_) {}
+
+      if (!rpcSucceeded) {
+        const { error } = await supabase.from('transactions').insert({
+          customer_id: c.id,
+          type,
+          amount,
+          note: note || null
+        });
+        if (error) throw error;
+      }
+
+      $('entryForm').reset();
+      message('message', `${type === 'purchase' ? '🛒 Purchase' : '💵 Payment'} of ${money(amount)} recorded.`);
+      await refreshData();
+    } catch (err) {
+      console.error(err);
+      message('message', `Could not save entry: ${err.message}`, true);
+    }
+  });
+
+  // Loyalty Points Redemption Preview
+  $('redeemPoints').addEventListener('input', () => {
+    const c = customers.find(x => String(x.id) === String(selectedId));
+    const n = Math.floor(Number($('redeemPoints').value) || 0);
+    const discount = Math.max(0, n) * 2;
+    $('redeemPreview').textContent = c
+      ? `Redeeming ${n} points = ${money(discount)} discount (Available: ${points(c)} pts · Udhaar: ${money(balance(c))})`
+      : 'Select a customer to see available points.';
+  });
+
+  // Loyalty Redemption Submit
+  $('redeemForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const c = customers.find(x => String(x.id) === String(selectedId));
+    if (!c) {
+      message('message', 'Please select a customer first.', true);
+      return;
+    }
+
+    const pointsUsed = Number($('redeemPoints').value);
+    const available = points(c);
+    const curBalance = balance(c);
+
+    if (!Number.isInteger(pointsUsed) || pointsUsed <= 0) {
+      message('message', 'Enter a whole number of points greater than 0.', true);
+      return;
+    }
+    if (pointsUsed > available) {
+      message('message', `Only ${available} loyalty points are available.`, true);
+      return;
+    }
+
+    const discountAmount = pointsUsed * 2;
+    if (curBalance <= 0) {
+      message('message', 'This customer has no remaining balance to apply a discount to.', true);
+      return;
+    }
+    if (discountAmount > curBalance) {
+      message('message', `Discount of ${money(discountAmount)} exceeds remaining bill of ${money(curBalance)}. Redeem fewer points.`, true);
+      return;
+    }
+
+    try {
+      // Try atomic RPC function first
+      let rpcSucceeded = false;
+      try {
+        const { data: rpcData, error: rpcErr } = await supabase.rpc('redeem_loyalty_points_secure', {
+          p_customer_id: c.id,
+          p_points_used: pointsUsed,
+          p_note: $('redeemNote').value.trim() || null
+        });
+        if (!rpcErr && rpcData?.success) {
+          rpcSucceeded = true;
+        }
+      } catch (_) {}
+
+      if (!rpcSucceeded) {
+        const { error } = await supabase.from('loyalty_redemptions').insert({
+          customer_id: c.id,
+          points_used: pointsUsed,
+          discount_amount: discountAmount,
+          note: $('redeemNote').value.trim() || null
+        });
+        if (error) throw error;
+      }
+
+      $('redeemForm').reset();
+      message('message', `🎉 ${pointsUsed} points redeemed! ${money(discountAmount)} discount applied to remaining bill.`);
+      await refreshData();
+    } catch (err) {
+      console.error(err);
+      message('message', `Could not redeem points: ${err.message}`, true);
+    }
+  });
+
+  // Search and Filter Listeners
+  $('searchCustomer').addEventListener('input', renderCustomersList);
+  $('clearSearch').addEventListener('click', () => {
+    $('searchCustomer').value = '';
+    renderCustomersList();
+  });
+  if ($('filterTxType')) $('filterTxType').addEventListener('change', renderSelectedBox);
+  if ($('filterTxDate')) $('filterTxDate').addEventListener('change', renderSelectedBox);
+  if ($('dirSearchInput')) $('dirSearchInput').addEventListener('input', renderDirectoryTable);
+
+  // CSV Export for Selected Customer Ledger
+  $('exportBtn').addEventListener('click', () => {
+    const c = customers.find(x => String(x.id) === String(selectedId));
+    if (!c) {
+      alert('Please select a customer first.');
+      return;
+    }
+
+    const rows = [
+      ['Customer Name', 'Phone', 'Date & Time (IST)', 'Entry Type', 'Amount (INR)', 'Loyalty Discount', 'Note', 'Balance After Entry', 'Points Remaining']
+    ];
+
+    let running = 0;
+    const sorted = customerTransactions(c).sort((a, b) => new Date(a.date) - new Date(b.date));
+    sorted.forEach(t => {
+      running += t.type === 'purchase' ? t.amount : -t.amount;
+      rows.push([
+        c.name,
+        c.phone || '',
+        new Date(t.date).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+        t.type === 'purchase' ? 'Purchase (+)' : 'Payment (-)',
+        t.amount,
+        0,
+        t.note || '',
+        Math.max(0, running),
+        points(c)
+      ]);
+    });
+
+    if (rows.length === 1) {
+      alert('No transactions recorded for this customer yet.');
+      return;
+    }
+
+    const csvContent = rows.map(r => r.map(sanitizeCsvCell).join(',')).join('\r\n');
+    downloadCsvBlob(csvContent, `khata-statement-${c.name.toLowerCase().replace(/\s+/g, '-')}.csv`);
+  });
+
+  // CSV Export for Complete Customer Directory
+  if ($('exportDirectoryCsvBtn')) {
+    $('exportDirectoryCsvBtn').addEventListener('click', () => {
+      if (!customers.length) {
+        alert('No customers to export.');
+        return;
+      }
+
+      const rows = [
+        ['Customer Name', 'Phone', 'Credit Limit', 'Current Outstanding Udhaar', 'Available Loyalty Points', 'Account Status']
+      ];
+
+      customers.forEach(c => {
+        rows.push([
+          c.name,
+          c.phone || '',
+          c.credit_limit,
+          balance(c),
+          points(c),
+          c.is_active ? 'Active' : 'Deactivated'
+        ]);
+      });
+
+      const csvContent = rows.map(r => r.map(sanitizeCsvCell).join(',')).join('\r\n');
+      downloadCsvBlob(csvContent, `kirana-customers-directory.csv`);
+    });
+  }
+
+  // Helper to trigger CSV download
+  function downloadCsvBlob(csvText, filename) {
+    const blob = new Blob(['\ufeff' + csvText], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast(`Exported ${filename}`);
+  }
+
+  // Customer Edit & Status Modal
+  function openEditCustomerModal(custId) {
+    const c = customers.find(x => String(x.id) === String(custId));
+    if (!c) return;
+
+    $('editCustomerId').value = c.id;
+    $('editCustomerName').value = c.name;
+    $('editCustomerPhone').value = c.phone || '';
+    $('editCreditLimit').value = c.credit_limit || 5000;
+    $('editCustomerNotes').value = c.notes || '';
+    $('editCustomerModal').classList.remove('hidden');
+  }
+
+  $('closeEditModalBtn').addEventListener('click', () => $('editCustomerModal').classList.add('hidden'));
+  $('cancelEditModalBtn').addEventListener('click', () => $('editCustomerModal').classList.add('hidden'));
+
+  $('editCustomerForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const id = $('editCustomerId').value;
+    const name = $('editCustomerName').value.trim();
+    const phone = $('editCustomerPhone').value.trim();
+    const credit_limit = Number($('editCreditLimit').value) || 5000;
+    const notes = $('editCustomerNotes').value.trim();
+
+    try {
+      const { error } = await supabase
+        .from('customers')
+        .update({ name, phone: phone || null, credit_limit, notes })
+        .eq('id', id);
+
+      if (error) throw error;
+      $('editCustomerModal').classList.add('hidden');
+      showToast('Customer account updated.');
+      await refreshData();
+    } catch (err) {
+      showToast(`Could not update: ${err.message}`, 'error');
+    }
+  });
+
+  async function toggleCustomerActiveStatus(custId, currentlyActive) {
+    const action = currentlyActive ? 'deactivate' : 'reactivate';
+    if (!confirm(`Are you sure you want to ${action} this customer account?`)) return;
+
+    try {
+      const { error } = await supabase
+        .from('customers')
+        .update({ is_active: !currentlyActive })
+        .eq('id', custId);
+
+      if (error) throw error;
+      showToast(`Customer account ${currentlyActive ? 'deactivated' : 'reactivated'}.`);
+      await refreshData();
+    } catch (err) {
+      showToast(`Error: ${err.message}`, 'error');
+    }
+  }
+
+  // Add Family Member Access
+  if ($('familyMemberForm')) {
+    $('familyMemberForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const custId = $('familySelectCustomer').value;
+      const memberName = $('familyMemberName').value.trim();
+      const memberPhone = $('familyMemberPhone').value.trim();
+      const memberEmail = $('familyMemberEmail').value.trim();
+      const role = $('familyMemberRole').value;
+
+      if (!custId || !memberName || !memberEmail) {
+        alert('Please fill all required fields.');
+        return;
+      }
+
+      const c = customers.find(x => String(x.id) === String(custId));
+      if (!c) return;
+
+      try {
+        // Look up or link family
+        let familyId = c.family_id;
+        if (!familyId) {
+          const { data: fData, error: fErr } = await supabase
+            .from('families')
+            .insert({
+              family_name: `${c.name} Family Khata`,
+              primary_phone: c.phone || memberPhone
+            })
+            .select()
+            .single();
+
+          if (!fErr && fData) {
+            familyId = fData.id;
+            await supabase.from('customers').update({ family_id: familyId }).eq('id', c.id);
+          }
+        }
+
+        const { error: mErr } = await supabase.from('family_members').insert({
+          family_id: familyId,
+          member_name: memberName,
+          phone: memberPhone || null,
+          email: memberEmail,
+          role,
+          status: 'active'
+        });
+
+        if (mErr) throw mErr;
+
+        $('familyMemberForm').reset();
+        showToast(`Authorized ${memberName} for ${c.name} Family Khata.`);
+        await refreshData();
+      } catch (err) {
+        showToast(`Could not authorize member: ${err.message}`, 'error');
+      }
+    });
+  }
+
+  // Payment Reminder Note Helper
+  $('sendReminderBtn').addEventListener('click', () => {
+    const c = customers.find(x => String(x.id) === String(selectedId));
+    if (!c) {
+      alert('Select a customer first.');
+      return;
+    }
+    const curBalance = balance(c);
+    if (curBalance <= 0) {
+      alert('This customer has no outstanding balance.');
+      return;
+    }
+    const msg = `Dear ${c.name}, greeting from Smart Kirana Store. Your current grocery khata balance is ${money(curBalance)}. Kindly settle at your earliest convenience. Thank you!`;
+    navigator.clipboard?.writeText(msg);
+    showToast('Reminder message copied to clipboard! You can share it via SMS or WhatsApp.');
+  });
+
+  // WebAuthn Biometric Enrollment (Browser & Standalone Terminal Ready)
+  async function enrollBiometric() {
+    if (!window.PublicKeyCredential) {
+      alert('Biometric WebAuthn is not supported on this browser/platform.');
+      return;
+    }
+
+    try {
+      const challenge = new Uint8Array(32);
+      window.crypto.getRandomValues(challenge);
+
+      const userIdBuffer = new TextEncoder().encode(session?.user?.id || 'kirana_user');
+
+      const credential = await navigator.credentials.create({
+        publicKey: {
+          challenge,
+          rp: { name: 'Smart Kirana Khata' },
+          user: {
+            id: userIdBuffer,
+            name: session?.user?.email || 'shopkeeper',
+            displayName: session?.user?.email || 'Shopkeeper'
+          },
+          pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+          authenticatorSelection: {
+            authenticatorAttachment: 'platform',
+            userVerification: 'preferred'
+          },
+          timeout: 60000
+        }
+      });
+
+      if (credential) {
+        showToast('👆 Fingerprint registered successfully on this terminal!');
+        if ($('biometricStatusText')) {
+          $('biometricStatusText').textContent = '✅ Biometric registered for this device.';
+        }
+      }
+    } catch (err) {
+      console.warn('Biometric registration error/canceled:', err);
+      showToast(`Biometric enrollment: ${err.name === 'NotAllowedError' ? 'Canceled by user' : err.message}`, 'error');
+    }
+  }
+
+  if ($('enrollBiometricBtn')) $('enrollBiometricBtn').addEventListener('click', enrollBiometric);
+  if ($('biometricLockBtn')) $('biometricLockBtn').addEventListener('click', enrollBiometric);
+
+  // Biometric Quick Login
+  if ($('webAuthnLoginBtn')) {
+    $('webAuthnLoginBtn').addEventListener('click', async () => {
+      if (!window.PublicKeyCredential) {
+        alert('WebAuthn biometrics not supported on this device.');
+        return;
+      }
+      try {
+        const challenge = new Uint8Array(32);
+        window.crypto.getRandomValues(challenge);
+
+        const assertion = await navigator.credentials.get({
+          publicKey: {
+            challenge,
+            userVerification: 'preferred',
+            timeout: 60000
+          }
+        });
+
+        if (assertion) {
+          showToast('Fingerprint verified! Resuming session...');
+          const { data } = await supabase.auth.getSession();
+          if (data?.session) {
+            session = data.session;
+            await refreshData();
+          } else {
+            showToast('Biometric verified. Please enter password once to initialize session.', 'info');
+          }
+        }
+      } catch (err) {
+        showToast('Biometric login canceled or sensor timed out.', 'error');
+      }
+    });
+  }
+
+  // APPLICATION STARTUP
+  async function start() {
+    if (!window.supabase) {
+      showSignedIn(false);
+      message('authMessage', 'Could not load Supabase client library. Check network connection.', true);
+      $('connectionStatusBadge').textContent = '🔴 Offline';
+      return;
+    }
+
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      if (!error && data?.session) {
+        session = data.session;
+        await refreshData();
+      } else {
+        showSignedIn(false);
+      }
+    } catch (e) {
+      showSignedIn(false);
+    }
+
+    supabase.auth.onAuthStateChange(async (_event, newSession) => {
+      session = newSession;
+      if (session) {
+        await refreshData();
+      } else {
+        customers = [];
+        transactions = [];
+        redemptions = [];
+        selectedId = null;
+        showSignedIn(false);
+      }
+    });
+
+    // Network status listener
+    window.addEventListener('online', () => {
+      $('connectionStatusBadge').textContent = '🟢 Online';
+      showToast('Network connection restored.');
+      refreshData();
+    });
+    window.addEventListener('offline', () => {
+      $('connectionStatusBadge').textContent = '🔴 Offline';
+      showToast('You are currently offline. Ledger requires network to sync.', 'error');
+    });
+  }
+
+  start();
+})();
+</script>
+</body>
+</html>

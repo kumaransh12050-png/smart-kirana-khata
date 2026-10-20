@@ -1,0 +1,21 @@
+{
+  "name": "smart-kirana-khata",
+  "version": "2.0.0",
+  "description": "Smart Kirana Khata - Enterprise Digital Ledger, Shared Family Khata & Loyalty Rewards",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "build": "echo 'Static build complete'"
+  },
+  "keywords": [
+    "kirana",
+    "khata",
+    "ledger",
+    "supabase",
+    "loyalty",
+    "grocery",
+    "accounting"
+  ],
+  "author": "Ansh raj",
+  "license": "MIT"
+}
